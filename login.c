@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 //**
+//testo
 //0. REIGSTRATION WORKS	 
 //1. upon registration, check for duplicate usernames
 //2. upon login, check for username and for matching password
