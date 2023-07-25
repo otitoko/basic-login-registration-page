@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_FILE_LENGTH 1024
 #define MAX_USERNAME_LENGTH 20
@@ -15,7 +16,7 @@
 //c. loop through array to check for a string that matches the intended username
 //
 //notes: how to store the info? linked list? check data algorithms
-//
+//	how to make the prompt loop on itself without seg faulting
 //
 //
 char login_or_register;
@@ -28,7 +29,8 @@ void printInitialPrompt();
 void login();
 void signIn();
 void register_to_file();
-int check_for_duplicates(char username[MAX_USERNAME_LENGTH]);
+int check_for_duplicates(char username[MAX_USERNAME_LENGTH], bool *ok_username_ptr);
+void username_prompt();
 
 int main(){
 	printInitialPrompt();
@@ -61,13 +63,12 @@ void login(){
 	fgets(password,sizeof(password),stdin);
 }
 void signIn(){
-	do{
-	printf("Enter your username: ");
-	fgets(username, sizeof(username),stdin);
-	username[strcspn(username, "\n")]= '\0';
+	bool ok_username = false;
+
+	username_prompt(&ok_username);
+	while(ok_username == false){
+		username_prompt(&ok_username);
 	}
-	while(check_for_duplicates(username) == 1);
-	
 
 	printf("\nEnter your password: ");
 	fgets(password, sizeof(password),stdin);
@@ -85,7 +86,7 @@ void check_for_file(FILE **fileptr, const char *FILENAME){
 	}
 }
 **/
-int check_for_duplicates(char *username){
+int check_for_duplicates(char *username, bool *ok_username_ptr){
 	FILE *fileptr;
 	char username_file[MAX_FILE_LENGTH];
 
@@ -97,15 +98,13 @@ int check_for_duplicates(char *username){
 		if(strstr(username_file,username) != NULL){
 			printf("Username already in use.\n");
 			fclose(fileptr);
+			*ok_username_ptr = false;
 			return 1;
 		}
 	}
-
 	fclose(fileptr);
-
+	*ok_username_ptr = true;
 	return 0;
-
-
 }
 
 void register_to_file(){
@@ -121,6 +120,14 @@ void register_to_file(){
 
 	fclose(fileptr);
 }
+
+void username_prompt(bool *ok_username_ptr){
+	printf("Enter your username: ");
+	fgets(username, sizeof(username),stdin);
+	username[strcspn(username, "\n")]= '\0';
+	check_for_duplicates(username,ok_username_ptr);
+}
+
 
 
 
